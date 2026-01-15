@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(http)) //Necessario quando o frontend acessa a API em um outro dominio e em outra porta
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //Nao havera sessao no servidor (muito necssario quando na API utiliza JWT ou tokens
                 .authorizeHttpRequests(authorize -> authorize
-                        .dispatcherTypeMatchers(DispatcherType.ERROR.).permitAll()
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "auth/register").permitAll()
                         .anyRequest().authenticated())

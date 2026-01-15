@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,22 +27,29 @@ public class AuthController {
 
 
     private final UserRepository repository;
+    private final PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
 
-
-    public AuthController(UserRepository repository) {
+    public AuthController(UserRepository repository, PasswordEncoder encoder, AuthenticationManager authenticationManager) {
         this.repository = repository;
+        this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
     }
 
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        UsernamePasswordAuthenticationToken userAndPass = new UsernamePasswordAuthenticationToken(request.email(), request.password());
+        Authentication authentication = authenticationManager.authenticate(userAndPass);
+
+
         return null;
     }
 
 
     public ResponseEntity<RegisterUserResponse> register(@Valid @RequestBody RegisterUserRequest request){
         User newUser = new User();
-        newUser.setPassword(request.pwassword()); //Dava pra ser tudo com mapper aqui, seria o ideal, mas como ta sendo so revisado....
+        newUser.setPassword(encoder.encode(request.pwassword()));; //Dava pra ser tudo com mapper aqui, seria o ideal, mas como ta sendo so revisado....
         newUser.setEmail(request.email());
         newUser.setName(request.name());
 
