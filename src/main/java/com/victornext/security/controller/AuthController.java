@@ -1,5 +1,6 @@
 package com.victornext.security.controller;
 
+import com.victornext.security.config.TokenConfig;
 import com.victornext.security.dto.request.LoginRequest;
 import com.victornext.security.dto.request.RegisterUserRequest;
 import com.victornext.security.dto.response.LoginResponse;
@@ -29,11 +30,13 @@ public class AuthController {
     private final UserRepository repository;
     private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
+    private final TokenConfig tokenConfig;
 
-    public AuthController(UserRepository repository, PasswordEncoder encoder, AuthenticationManager authenticationManager) {
+    public AuthController(UserRepository repository, PasswordEncoder encoder, AuthenticationManager authenticationManager, TokenConfig tokenConfig) {
         this.repository = repository;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;
+        this.tokenConfig = tokenConfig;
     }
 
 
@@ -42,8 +45,10 @@ public class AuthController {
         UsernamePasswordAuthenticationToken userAndPass = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         Authentication authentication = authenticationManager.authenticate(userAndPass);
 
+        User user = (User) authentication.getPrincipal();
+        String token = tokenConfig.generateToken(user);
 
-        return null;
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
 
